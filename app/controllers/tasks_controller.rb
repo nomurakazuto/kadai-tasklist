@@ -1,7 +1,8 @@
 class TasksController < ApplicationController
     before_action :set_task, only: [:edit, :show, :destroy, :update]
+    before_action :require_user_logged_in?, only: [:index]
     def index
-        @tasks = Task.all
+        @tasks = current_user.tasks
     end
     
     def show
@@ -9,11 +10,11 @@ class TasksController < ApplicationController
     end
     
     def new
-        @task = Task.new
+        @task = current_user.tasks.build
     end
     
     def create
-        @task = Task.new(task_params)
+        @task = current_user.tasks.build(task_params)
         
         if @task.save
             flash[:success] = "タスクを追加しました。"
@@ -56,4 +57,7 @@ class TasksController < ApplicationController
     def task_params
         params.require(:task).permit(:content, :status)
     end
+    
+    private
+    
 end
