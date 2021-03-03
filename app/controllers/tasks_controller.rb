@@ -1,6 +1,6 @@
 class TasksController < ApplicationController
     before_action :set_task, only: [:edit, :show, :destroy, :update]
-    before_action :require_user_logged_in?, only: [:index]
+    before_action :require_user_logged_in?, only: [:index, :new, :create]
     def index
         @tasks = current_user.tasks
     end
@@ -18,7 +18,7 @@ class TasksController < ApplicationController
         
         if @task.save
             flash[:success] = "タスクを追加しました。"
-            redirect_to @task 
+            redirect_to root_url 
         else
             flash.now[:danger] = "タスクを追加できませんでした"
             render :new
@@ -51,13 +51,15 @@ class TasksController < ApplicationController
     
     private
     def set_task
-      @task = Task.find(params[:id])
+      @task = current_user.tasks.find_by(id: params[:id])
+      unless @task
+        redirect_to root_url
+      end
     end
     
     def task_params
         params.require(:task).permit(:content, :status)
     end
     
-    private
     
 end
